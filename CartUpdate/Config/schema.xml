@@ -22,4 +22,17 @@
         </behavior>
     </table>
     -->
+
+
+    <table name="cart_update" namespace="CartUpdate\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column defaultValue="0" name="code_promo_changed" required="true" type="BOOLEAN" />
+        <column defaultValue="0" name="price_changed" required="true" type="BOOLEAN" />
+        <column defaultValue="null" name="cart_id" required="true" type="INTEGER" />
+
+        <foreign-key foreignTable="cart" name="fk_cart_id" onDelete="CASCADE" onUpdate="RESTRICT">
+            <reference foreign="id" local="cart_id" />
+        </foreign-key>
+    </table>
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

@@ -3,12 +3,17 @@
 namespace CartUpdate\EventListeners;
 
 use CartUpdate\Service\UpdateManagement;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Order\OrderProductEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
+use Thelia\Model\Event\ProductEvent;
 
 class CartUpdateEventsListener implements EventSubscriberInterface
 {
@@ -23,15 +28,17 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     }
 
 
-    public function orderProdAfterCreate(OrderProductEvent $orderProductEvent)
+    /**
+     * @throws PropelException
+     */
+    public function orderProdAfterCreate(OrderEvent $orderEvent)
     {
-
-        $customerId = $this->management->getCustomerIdWithOrderProductEvent($orderProductEvent);
+        $customerId = $this->management->getCustomerIdWithOrderEvent($orderEvent);
         $this->management->UpdateCart($customerId);
     }
 
     /**
-     * @throws \Propel\Runtime\Exception\PropelException
+     * @throws PropelException
      */
     public function customerAfterLogin(CustomerLoginEvent $customerLoginEvent)
     {
@@ -45,7 +52,7 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CUSTOMER_LOGIN => ["customerAfterLogin", 1],
-            TheliaEvents::ORDER_PAY =>["orderProdAfterCreate", 128]
+            TheliaEvents::ORDER_PAY =>["orderProdAfterCreate", 128],
         ];
     }
 
