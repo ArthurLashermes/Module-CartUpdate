@@ -20,18 +20,17 @@ class UpdateManagement
     /**
      * @throws PropelException
      */
-    public function getCustomerIdWithOrderEvent(OrderProductEvent $orderEvent): int
+    public function getCustomerIdWithOrderEvent(OrderEvent $orderEvent): int
     {
-        $cartItemId = $orderEvent->getCartItemId();
+        $cartItemId = $orderEvent->getOrder()->getCartId();
+        if($cartItemId == null){
+            return $cartItemId;
+        }
 
-        $cartItem = CartItemQuery::create()
-            ->filterById($cartItemId)
-            ->findOne();
 
-        $cartId = $cartItem->getCartId();
 
         $cart = CartQuery::create()
-            ->filterById($cartId)
+            ->filterById($cartItemId)
             ->findOne();
 
         return $cart->getCustomer()->getId();//controller le cas null de customer
