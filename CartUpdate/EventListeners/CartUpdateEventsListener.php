@@ -52,7 +52,7 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CUSTOMER_LOGIN => ["customerAfterLogin", 1],
-            TheliaEvents::ORDER_PAY =>["orderProdAfterCreate", 128],
+            TheliaEvents::ORDER_PAY =>["orderProdAfterCreate", 1],
         ];
     }
 
