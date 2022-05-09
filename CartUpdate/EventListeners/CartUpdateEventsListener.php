@@ -31,7 +31,7 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     /**
      * @throws PropelException
      */
-    public function orderProdAfterCreate(OrderEvent $orderEvent)
+    private function orderProdAfterCreate(OrderEvent $orderEvent)
     {
         $customerId = $this->management->getCustomerIdWithOrderEvent($orderEvent);
         $this->management->UpdateCart($customerId);
@@ -40,9 +40,8 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     /**
      * @throws PropelException
      */
-    public function customerAfterLogin(CustomerLoginEvent $customerLoginEvent)
+    private function customerAfterLogin(CustomerLoginEvent $customerLoginEvent)
     {
-
         $customerId = $this->management->getCustomerIdWithCustomerLoginEvent($customerLoginEvent);
         $this->management->UpdateCart($customerId);
     }
@@ -52,7 +51,7 @@ class CartUpdateEventsListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::CUSTOMER_LOGIN => ["customerAfterLogin", 1],
-            TheliaEvents::ORDER_PAY =>["orderProdAfterCreate", 1],
+            TheliaEvents::ORDER_BEFORE_PAYMENT =>["orderProdAfterCreate", 1],
         ];
     }
 

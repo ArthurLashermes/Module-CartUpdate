@@ -7,6 +7,8 @@ use CartUpdate\Model\CartUpdateQuery;
 use DateTime;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
@@ -22,19 +24,7 @@ class UpdateManagement
      */
     public function getCustomerIdWithOrderEvent(OrderEvent $orderEvent): int
     {
-        $cartItemId = $orderEvent->getOrder()->getCartId();
-        if($cartItemId == null){
-            return $cartItemId;
-        }
-
-
-
-        $cart = CartQuery::create()
-            ->filterById($cartItemId)
-            ->findOne();
-
-        return $cart->getCustomer()->getId();//controller le cas null de customer
-
+        return $orderEvent->getOrder()->getCustomerId();
     }
 
     public function getCustomerIdWithCustomerLoginEvent(CustomerLoginEvent $customerLoginEvent): int
@@ -70,7 +60,7 @@ class UpdateManagement
     /**
      * @throws PropelException
      */
-    public function deleteCustomerCart($customerId)
+    private function deleteCustomerCart($customerId)
     {
         CartQuery::create()
             ->filterByCustomerId($customerId)
@@ -80,7 +70,7 @@ class UpdateManagement
     /**
      * @throws PropelException
      */
-    public function updateCustomerCart($customerId)
+    private function updateCustomerCart($customerId)
     {
         $cart = CartQuery::create()
             ->filterByCustomerId($customerId)
@@ -101,18 +91,20 @@ class UpdateManagement
                     ->save();
                 $cartUpdate = $this->getCartUpdated($cartItem);
                 $cartUpdate->setCodePromoChanged(true);
+                $cartUpdate->save();
             }
-            if ($product_price->getPrice() != $cartItem->getPrice()) {//les if en trop
+            if ($product_price->getPrice() != $cartItem->getPrice()) {
                 $cartItem
                     ->setPrice($product_price->getPrice())
                     ->save();
                 $cartUpdate = $this->getCartUpdated($cartItem);
                 $cartUpdate->setPriceChanged(true);
+                $cartUpdate->save();
             }
         }
     }
 
-    public function getCartUpdated($cartItem): CartUpdate
+    private function getCartUpdated($cartItem): CartUpdate
     {
         $cartUpdate = CartUpdateQuery::create()
             ->filterByCartId($cartItem->getCartId())
